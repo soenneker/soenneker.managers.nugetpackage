@@ -30,7 +30,7 @@ public class NuGetPackageManager : INuGetPackageManager
         _fileUtilSync = fileUtilSync;
     }
 
-    public async ValueTask BuildPackAndPushExe(string gitDirectory, string targetCsProj, string targetExePath, string filePath, string version, string nuGetToken, CancellationToken cancellationToken)
+    public async ValueTask BuildPackAndPushExe(string gitDirectory, string libraryName, string targetExePath, string filePath, string version, string nuGetToken, CancellationToken cancellationToken)
     {
         // Delete if old file exists
         _fileUtilSync.DeleteIfExists(targetExePath);
@@ -43,7 +43,7 @@ public class NuGetPackageManager : INuGetPackageManager
         _fileUtilSync.Move(filePath, targetExePath);
 
         // Build .csproj path
-        string projFilePath = Path.Combine(gitDirectory, "src", $"{targetCsProj}.csproj");
+        string projFilePath = Path.Combine(gitDirectory, "src", $"{libraryName}.csproj");
 
         // Dotnet restore
         await _dotnetUtil.Restore(projFilePath, cancellationToken: cancellationToken);
@@ -67,7 +67,7 @@ public class NuGetPackageManager : INuGetPackageManager
             cancellationToken: cancellationToken).NoSync();
 
         // Build .nupkg file path
-        string nuGetPackagePath = Path.Combine(gitDirectory, $"{targetCsProj}.{version}.nupkg");
+        string nuGetPackagePath = Path.Combine(gitDirectory, $"{libraryName}.{version}.nupkg");
 
         // Push package
         await _dotnetNuGetUtil.Push(nuGetPackagePath, apiKey: nuGetToken, cancellationToken: cancellationToken).NoSync();

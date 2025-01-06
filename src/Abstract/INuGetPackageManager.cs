@@ -8,5 +8,5 @@ namespace Soenneker.Managers.NuGetPackage.Abstract;
 /// </summary>
 public interface INuGetPackageManager
 {
-    ValueTask BuildPackAndPushExe(string gitDirectory, string targetCsProj, string targetExePath, string filePath, string version, string nuGetToken, CancellationToken cancellationToken = default);
+    ValueTask BuildPackAndPushExe(string gitDirectory, string libraryName, string targetExePath, string filePath, string version, string nuGetToken, CancellationToken cancellationToken = default);
 }
