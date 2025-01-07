@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Soenneker.Managers.NuGetPackage.Abstract;
 using Soenneker.Utils.Directory.Registrars;
 using Soenneker.Utils.Dotnet.NuGet.Registrars;
+using Soenneker.Utils.File.Registrars;
 using Soenneker.Utils.FileSync.Registrars;
 
 namespace Soenneker.Managers.NuGetPackage.Registrars;
@@ -18,6 +19,7 @@ public static class NuGetPackageManagerRegistrar
     public static IServiceCollection AddNuGetPackageManagerAsSingleton(this IServiceCollection services)
     {
         services.AddFileUtilSyncAsSingleton();
+        services.AddFileUtilAsSingleton();
         services.AddDotnetNuGetUtilAsSingleton();
         services.AddDirectoryUtilAsSingleton();
 
@@ -32,6 +34,7 @@ public static class NuGetPackageManagerRegistrar
     public static IServiceCollection AddNuGetPackageManagerAsScoped(this IServiceCollection services)
     {
         services.AddFileUtilSyncAsScoped();
+        services.AddFileUtilAsScoped();
         services.AddDotnetNuGetUtilAsScoped();
         services.AddDirectoryUtilAsScoped();
 

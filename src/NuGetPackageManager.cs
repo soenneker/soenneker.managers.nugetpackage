@@ -9,6 +9,7 @@ using Soenneker.Utils.Dotnet.Abstract;
 using Soenneker.Utils.Dotnet.NuGet.Abstract;
 using Soenneker.Utils.FileSync.Abstract;
 using Soenneker.Extensions.ValueTask;
+using Soenneker.Utils.File.Abstract;
 
 namespace Soenneker.Managers.NuGetPackage;
 
@@ -20,14 +21,17 @@ public class NuGetPackageManager : INuGetPackageManager
     private readonly IDotnetNuGetUtil _dotnetNuGetUtil;
     private readonly IDirectoryUtil _directoryUtil;
     private readonly IFileUtilSync _fileUtilSync;
+    private readonly IFileUtil _fileUtil;
 
-    public NuGetPackageManager(ILogger<NuGetPackageManager> logger, IDotnetUtil dotnetUtil, IDotnetNuGetUtil dotnetNuGetUtil, IDirectoryUtil directoryUtil, IFileUtilSync fileUtilSync)
+    public NuGetPackageManager(ILogger<NuGetPackageManager> logger, IDotnetUtil dotnetUtil, IDotnetNuGetUtil dotnetNuGetUtil, IDirectoryUtil directoryUtil, 
+        IFileUtilSync fileUtilSync, IFileUtil fileUtil)
     {
         _logger = logger;
         _dotnetUtil = dotnetUtil;
         _dotnetNuGetUtil = dotnetNuGetUtil;
         _directoryUtil = directoryUtil;
         _fileUtilSync = fileUtilSync;
+        _fileUtil = fileUtil;
     }
 
     public async ValueTask BuildPackAndPushExe(string gitDirectory, string libraryName, string targetExePath, string filePath, string version, string nuGetToken, CancellationToken cancellationToken)
@@ -39,20 +43,19 @@ public class NuGetPackageManager : INuGetPackageManager
         string resourcesDir = Path.Combine(gitDirectory, "src", "Resources");
         _directoryUtil.CreateIfDoesNotExist(resourcesDir);
 
-        // Move new file
-        _fileUtilSync.Move(filePath, targetExePath);
+        await _fileUtil.Copy(filePath, targetExePath, cancellationToken).NoSync();
 
         // Build .csproj path
         string projFilePath = Path.Combine(gitDirectory, "src", $"{libraryName}.csproj");
 
         // Dotnet restore
-        await _dotnetUtil.Restore(projFilePath, cancellationToken: cancellationToken);
+        await _dotnetUtil.Restore(projFilePath, cancellationToken: cancellationToken).NoSync();
 
         // Dotnet build
         bool successful = await _dotnetUtil.Build(
             projFilePath,
             configuration: "Release",
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken).NoSync();
 
         if (!successful)
             throw new Exception("Build was not successful, exiting...");
