@@ -1,4 +1,4 @@
-# Contributing to Soenneker.Managers.NuGetPackage
+﻿# Contributing to Soenneker.Managers.NuGetPackage
 
 We're excited that you're interested in contributing!
 
