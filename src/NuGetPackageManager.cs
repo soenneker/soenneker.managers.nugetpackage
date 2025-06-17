@@ -14,7 +14,7 @@ using Soenneker.Utils.File.Abstract;
 namespace Soenneker.Managers.NuGetPackage;
 
 /// <inheritdoc cref="INuGetPackageManager"/>
-public class NuGetPackageManager : INuGetPackageManager
+public sealed class NuGetPackageManager : INuGetPackageManager
 {
     private readonly ILogger<NuGetPackageManager> _logger;
     private readonly IDotnetUtil _dotnetUtil;
@@ -43,7 +43,7 @@ public class NuGetPackageManager : INuGetPackageManager
         string resourcesDir = Path.Combine(gitDirectory, "src", "Resources");
         _directoryUtil.CreateIfDoesNotExist(resourcesDir);
 
-        await _fileUtil.Copy(filePath, targetExePath, cancellationToken).NoSync();
+        await _fileUtil.Copy(filePath, targetExePath, true, cancellationToken).NoSync();
 
         // Build .csproj path
         string projFilePath = Path.Combine(gitDirectory, "src", $"{libraryName}.csproj");
