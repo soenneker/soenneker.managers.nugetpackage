@@ -18,12 +18,11 @@ public static class NuGetPackageManagerRegistrar
     /// </summary>
     public static IServiceCollection AddNuGetPackageManagerAsSingleton(this IServiceCollection services)
     {
-        services.AddFileUtilSyncAsSingleton();
-        services.AddFileUtilAsSingleton();
-        services.AddDotnetNuGetUtilAsSingleton();
-        services.AddDirectoryUtilAsSingleton();
-
-        services.TryAddSingleton<INuGetPackageManager, NuGetPackageManager>();
+        services.AddFileUtilSyncAsSingleton()
+                .AddFileUtilAsSingleton()
+                .AddDotnetNuGetUtilAsSingleton()
+                .AddDirectoryUtilAsSingleton()
+                .TryAddSingleton<INuGetPackageManager, NuGetPackageManager>();
 
         return services;
     }
@@ -33,12 +32,11 @@ public static class NuGetPackageManagerRegistrar
     /// </summary>
     public static IServiceCollection AddNuGetPackageManagerAsScoped(this IServiceCollection services)
     {
-        services.AddFileUtilSyncAsScoped();
-        services.AddFileUtilAsScoped();
-        services.AddDotnetNuGetUtilAsScoped();
-        services.AddDirectoryUtilAsScoped();
-
-        services.TryAddScoped<INuGetPackageManager, NuGetPackageManager>();
+        services.AddFileUtilSyncAsScoped()
+                .AddFileUtilAsScoped()
+                .AddDotnetNuGetUtilAsScoped()
+                .AddDirectoryUtilAsScoped()
+                .TryAddScoped<INuGetPackageManager, NuGetPackageManager>();
 
         return services;
     }
