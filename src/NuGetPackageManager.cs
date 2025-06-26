@@ -69,7 +69,7 @@ public sealed class NuGetPackageManager : INuGetPackageManager
         _directoryUtil.DeleteIfExists(targetDirectory);
         _directoryUtil.CreateIfDoesNotExist(targetDirectory);
 
-        await _fileUtil.Copy(sourceDirectory, targetDirectory, true, cancellationToken).NoSync();
+        await _fileUtil.CopyRecursively(sourceDirectory, targetDirectory, true, cancellationToken).NoSync();
 
         string projFilePath = Path.Combine(gitDirectory, "src", $"{libraryName}.csproj");
 
