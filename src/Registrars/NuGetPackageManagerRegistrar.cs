@@ -4,7 +4,6 @@ using Soenneker.Managers.NuGetPackage.Abstract;
 using Soenneker.Utils.Directory.Registrars;
 using Soenneker.Utils.Dotnet.NuGet.Registrars;
 using Soenneker.Utils.File.Registrars;
-using Soenneker.Utils.FileSync.Registrars;
 
 namespace Soenneker.Managers.NuGetPackage.Registrars;
 
