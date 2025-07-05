@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Soenneker.Utils.Directory.Abstract;
 using Soenneker.Utils.Dotnet.Abstract;
 using Soenneker.Utils.Dotnet.NuGet.Abstract;
-using Soenneker.Utils.FileSync.Abstract;
 using Soenneker.Extensions.ValueTask;
 using Soenneker.Utils.File.Abstract;
 
@@ -20,24 +19,22 @@ public sealed class NuGetPackageManager : INuGetPackageManager
     private readonly IDotnetUtil _dotnetUtil;
     private readonly IDotnetNuGetUtil _dotnetNuGetUtil;
     private readonly IDirectoryUtil _directoryUtil;
-    private readonly IFileUtilSync _fileUtilSync;
     private readonly IFileUtil _fileUtil;
 
     public NuGetPackageManager(ILogger<NuGetPackageManager> logger, IDotnetUtil dotnetUtil, IDotnetNuGetUtil dotnetNuGetUtil, IDirectoryUtil directoryUtil,
-        IFileUtilSync fileUtilSync, IFileUtil fileUtil)
+        IFileUtil fileUtil)
     {
         _logger = logger;
         _dotnetUtil = dotnetUtil;
         _dotnetNuGetUtil = dotnetNuGetUtil;
         _directoryUtil = directoryUtil;
-        _fileUtilSync = fileUtilSync;
         _fileUtil = fileUtil;
     }
 
     public async ValueTask BuildPackAndPushFile(string gitDirectory, string libraryName, string targetFilePath, string sourceFilePath, string version,
         string nuGetToken, CancellationToken cancellationToken = default)
     {
-        _fileUtilSync.DeleteIfExists(targetFilePath);
+        await _fileUtil.DeleteIfExists(targetFilePath, cancellationToken: cancellationToken);
 
         string resourcesDir = Path.Combine(gitDirectory, "src", "Resources");
         _directoryUtil.CreateIfDoesNotExist(resourcesDir);
