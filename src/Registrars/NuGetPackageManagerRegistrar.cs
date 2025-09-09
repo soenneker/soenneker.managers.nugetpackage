@@ -18,9 +18,9 @@ public static class NuGetPackageManagerRegistrar
     public static IServiceCollection AddNuGetPackageManagerAsSingleton(this IServiceCollection services)
     {
         services.AddFileUtilAsSingleton()
-                .AddDotnetNuGetUtilAsSingleton()
-                .AddDirectoryUtilAsSingleton()
-                .TryAddSingleton<INuGetPackageManager, NuGetPackageManager>();
+            .AddDotnetNuGetUtilAsSingleton()
+            .AddDirectoryUtilAsSingleton()
+            .TryAddSingleton<INuGetPackageManager, NuGetPackageManager>();
 
         return services;
     }
@@ -30,7 +30,10 @@ public static class NuGetPackageManagerRegistrar
     /// </summary>
     public static IServiceCollection AddNuGetPackageManagerAsScoped(this IServiceCollection services)
     {
-        services.AddFileUtilAsScoped().AddDotnetNuGetUtilAsScoped().AddDirectoryUtilAsScoped().TryAddScoped<INuGetPackageManager, NuGetPackageManager>();
+        services.AddFileUtilAsScoped()
+            .AddDotnetNuGetUtilAsScoped()
+            .AddDirectoryUtilAsScoped()
+            .TryAddScoped<INuGetPackageManager, NuGetPackageManager>();
 
         return services;
     }
