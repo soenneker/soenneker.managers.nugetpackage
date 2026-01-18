@@ -37,7 +37,7 @@ public sealed class NuGetPackageManager : INuGetPackageManager
         await _fileUtil.DeleteIfExists(targetFilePath, cancellationToken: cancellationToken);
 
         string resourcesDir = Path.Combine(gitDirectory, "src", "Resources");
-        _directoryUtil.CreateIfDoesNotExist(resourcesDir);
+        await _directoryUtil.CreateIfDoesNotExist(resourcesDir).NoSync();
 
         await _fileUtil.Copy(sourceFilePath, targetFilePath, true, cancellationToken).NoSync();
 
@@ -63,8 +63,8 @@ public sealed class NuGetPackageManager : INuGetPackageManager
     public async ValueTask BuildPackAndPushDirectory(string gitDirectory, string libraryName, string targetDirectory, string sourceDirectory, string version,
         string nuGetToken, CancellationToken cancellationToken = default)
     {
-        _directoryUtil.DeleteIfExists(targetDirectory);
-        _directoryUtil.CreateIfDoesNotExist(targetDirectory);
+        await _directoryUtil.DeleteIfExists(targetDirectory).NoSync();
+        await _directoryUtil.CreateIfDoesNotExist(targetDirectory).NoSync();
 
         await _fileUtil.CopyRecursively(sourceDirectory, targetDirectory, true, cancellationToken).NoSync();
 
