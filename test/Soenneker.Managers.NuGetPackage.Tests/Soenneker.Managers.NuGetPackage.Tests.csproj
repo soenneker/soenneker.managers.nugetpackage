@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Soenneker.Managers.NuGetPackage.csproj" />
+        <ProjectReference Include="..\..\src\Soenneker.Managers.NuGetPackage\Soenneker.Managers.NuGetPackage.csproj" />
     </ItemGroup>
 
     <ItemGroup>
