@@ -34,18 +34,23 @@ public sealed class NuGetPackageManager : INuGetPackageManager
     public async ValueTask BuildPackAndPushFile(string gitDirectory, string libraryName, string targetFilePath, string sourceFilePath, string version,
         string nuGetToken, CancellationToken cancellationToken = default)
     {
-        await _fileUtil.DeleteIfExists(targetFilePath, cancellationToken: cancellationToken).NoSync();
+        await _fileUtil.DeleteIfExists(targetFilePath, cancellationToken: cancellationToken)
+                       .NoSync();
 
-        string resourcesDir = Path.Combine(gitDirectory, "src", "Resources");
-        await _directoryUtil.Create(resourcesDir, cancellationToken: cancellationToken).NoSync();
+        string resourcesDir = Path.Combine(gitDirectory, "src", libraryName, "Resources");
+        await _directoryUtil.Create(resourcesDir, cancellationToken: cancellationToken)
+                            .NoSync();
 
-        await _fileUtil.Copy(sourceFilePath, targetFilePath, true, cancellationToken).NoSync();
+        await _fileUtil.Copy(sourceFilePath, targetFilePath, true, cancellationToken)
+                       .NoSync();
 
-        string projFilePath = Path.Combine(gitDirectory, "src", $"{libraryName}.csproj");
+        string projFilePath = Path.Combine(gitDirectory, "src", libraryName, $"{libraryName}.csproj");
 
-        await _dotnetUtil.Restore(projFilePath, cancellationToken: cancellationToken).NoSync();
+        await _dotnetUtil.Restore(projFilePath, cancellationToken: cancellationToken)
+                         .NoSync();
 
-        bool successful = await _dotnetUtil.Build(projFilePath, configuration: "Release", cancellationToken: cancellationToken).NoSync();
+        bool successful = await _dotnetUtil.Build(projFilePath, configuration: "Release", cancellationToken: cancellationToken)
+                                           .NoSync();
 
         if (!successful)
             throw new Exception("Build was not successful, exiting...");
@@ -55,7 +60,8 @@ public sealed class NuGetPackageManager : INuGetPackageManager
 
         string nuGetPackagePath = Path.Combine(gitDirectory, $"{libraryName}.{version}.nupkg");
 
-        await _dotnetNuGetUtil.Push(nuGetPackagePath, apiKey: nuGetToken, cancellationToken: cancellationToken).NoSync();
+        await _dotnetNuGetUtil.Push(nuGetPackagePath, apiKey: nuGetToken, cancellationToken: cancellationToken)
+                              .NoSync();
 
         _logger.LogInformation("Package pushed to NuGet successfully.");
     }
@@ -63,16 +69,21 @@ public sealed class NuGetPackageManager : INuGetPackageManager
     public async ValueTask BuildPackAndPushDirectory(string gitDirectory, string libraryName, string targetDirectory, string sourceDirectory, string version,
         string nuGetToken, CancellationToken cancellationToken = default)
     {
-        await _directoryUtil.DeleteIfExists(targetDirectory, cancellationToken).NoSync();
-        await _directoryUtil.Create(targetDirectory, cancellationToken: cancellationToken).NoSync();
+        await _directoryUtil.DeleteIfExists(targetDirectory, cancellationToken)
+                            .NoSync();
+        await _directoryUtil.Create(targetDirectory, cancellationToken: cancellationToken)
+                            .NoSync();
 
-        await _fileUtil.CopyRecursively(sourceDirectory, targetDirectory, true, cancellationToken).NoSync();
+        await _fileUtil.CopyRecursively(sourceDirectory, targetDirectory, true, cancellationToken)
+                       .NoSync();
 
-        string projFilePath = Path.Combine(gitDirectory, "src", $"{libraryName}.csproj");
+        string projFilePath = Path.Combine(gitDirectory, "src", libraryName, $"{libraryName}.csproj");
 
-        await _dotnetUtil.Restore(projFilePath, cancellationToken: cancellationToken).NoSync();
+        await _dotnetUtil.Restore(projFilePath, cancellationToken: cancellationToken)
+                         .NoSync();
 
-        bool successful = await _dotnetUtil.Build(projFilePath, configuration: "Release", cancellationToken: cancellationToken).NoSync();
+        bool successful = await _dotnetUtil.Build(projFilePath, configuration: "Release", cancellationToken: cancellationToken)
+                                           .NoSync();
 
         if (!successful)
             throw new Exception("Build was not successful, exiting...");
@@ -80,9 +91,10 @@ public sealed class NuGetPackageManager : INuGetPackageManager
         await _dotnetUtil.Pack(projFilePath, version, configuration: "Release", restore: false, output: gitDirectory, cancellationToken: cancellationToken)
                          .NoSync();
 
-        string nuGetPackagePath = Path.Combine(gitDirectory, $"{libraryName}.{version}.nupkg");
+        string nuGetPackagePath = Path.Combine(gitDirectory, libraryName, $"{libraryName}.{version}.nupkg");
 
-        await _dotnetNuGetUtil.Push(nuGetPackagePath, apiKey: nuGetToken, cancellationToken: cancellationToken).NoSync();
+        await _dotnetNuGetUtil.Push(nuGetPackagePath, apiKey: nuGetToken, cancellationToken: cancellationToken)
+                              .NoSync();
 
         _logger.LogInformation("Package pushed to NuGet successfully.");
     }
