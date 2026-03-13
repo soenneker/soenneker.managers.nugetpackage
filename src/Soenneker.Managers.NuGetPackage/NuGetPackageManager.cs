@@ -91,7 +91,7 @@ public sealed class NuGetPackageManager : INuGetPackageManager
         await _dotnetUtil.Pack(projFilePath, version, configuration: "Release", restore: false, output: gitDirectory, cancellationToken: cancellationToken)
                          .NoSync();
 
-        string nuGetPackagePath = Path.Combine(gitDirectory, libraryName, $"{libraryName}.{version}.nupkg");
+        string nuGetPackagePath = Path.Combine(gitDirectory, $"{libraryName}.{version}.nupkg");
 
         await _dotnetNuGetUtil.Push(nuGetPackagePath, apiKey: nuGetToken, cancellationToken: cancellationToken)
                               .NoSync();
