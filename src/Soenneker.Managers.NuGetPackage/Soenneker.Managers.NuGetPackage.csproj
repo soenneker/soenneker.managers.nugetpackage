@@ -44,7 +44,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Soenneker.Utils.Directory" Version="4.0.844" />
+        <PackageReference Include="Soenneker.Utils.Directory" Version="4.0.845" />
         <PackageReference Include="Soenneker.Utils.Dotnet.NuGet" Version="4.0.1977" />
         <PackageReference Include="Soenneker.Utils.File" Version="4.0.2143" />
     </ItemGroup>
