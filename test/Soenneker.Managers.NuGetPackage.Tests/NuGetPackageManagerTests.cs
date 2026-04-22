@@ -1,20 +1,19 @@
 using Soenneker.Managers.NuGetPackage.Abstract;
-using Soenneker.Tests.FixturedUnit;
-using Xunit;
+using Soenneker.Tests.HostedUnit;
 
 namespace Soenneker.Managers.NuGetPackage.Tests;
 
-[Collection("Collection")]
-public class NuGetPackageManagerTests : FixturedUnitTest
+[ClassDataSource<Host>(Shared = SharedType.PerTestSession)]
+public class NuGetPackageManagerTests : HostedUnitTest
 {
     private readonly INuGetPackageManager _util;
 
-    public NuGetPackageManagerTests(Fixture fixture, ITestOutputHelper output) : base(fixture, output)
+    public NuGetPackageManagerTests(Host host) : base(host)
     {
         _util = Resolve<INuGetPackageManager>(true);
     }
 
-    [Fact]
+    [Test]
     public void Default()
     {
 
