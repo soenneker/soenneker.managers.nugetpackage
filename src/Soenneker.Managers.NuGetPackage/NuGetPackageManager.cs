@@ -12,7 +12,6 @@ using Soenneker.Utils.File.Abstract;
 
 namespace Soenneker.Managers.NuGetPackage;
 
-/// <inheritdoc cref="INuGetPackageManager"/>
 public sealed class NuGetPackageManager : INuGetPackageManager
 {
     private readonly ILogger<NuGetPackageManager> _logger;
@@ -34,17 +33,19 @@ public sealed class NuGetPackageManager : INuGetPackageManager
     public async ValueTask BuildPackAndPushFile(string gitDirectory, string libraryName, string targetFilePath, string sourceFilePath, string version,
         string nuGetToken, CancellationToken cancellationToken = default)
     {
-        await _fileUtil.DeleteIfExists(targetFilePath, cancellationToken: cancellationToken)
+        string resourcesDir = GetPathWithin(gitDirectory, Path.Combine("src", libraryName, "Resources"), "Resources directory");
+        string safeTargetFilePath = GetPathWithin(resourcesDir, targetFilePath, "Target file");
+
+        await _fileUtil.DeleteIfExists(safeTargetFilePath, cancellationToken: cancellationToken)
                        .NoSync();
 
-        string resourcesDir = Path.Combine(gitDirectory, "src", libraryName, "Resources");
         await _directoryUtil.Create(resourcesDir, cancellationToken: cancellationToken)
                             .NoSync();
 
-        await _fileUtil.Copy(sourceFilePath, targetFilePath, true, cancellationToken)
+        await _fileUtil.Copy(sourceFilePath, safeTargetFilePath, true, cancellationToken)
                        .NoSync();
 
-        string projFilePath = Path.Combine(gitDirectory, "src", libraryName, $"{libraryName}.csproj");
+        string projFilePath = GetPathWithin(gitDirectory, Path.Combine("src", libraryName, $"{libraryName}.csproj"), "Project file");
 
         await _dotnetUtil.Restore(projFilePath, cancellationToken: cancellationToken)
                          .NoSync();
@@ -53,12 +54,12 @@ public sealed class NuGetPackageManager : INuGetPackageManager
                                            .NoSync();
 
         if (!successful)
-            throw new Exception("Build was not successful, exiting...");
+            throw new InvalidOperationException("Build was not successful, exiting...");
 
         await _dotnetUtil.Pack(projFilePath, version, configuration: "Release", restore: false, output: gitDirectory, cancellationToken: cancellationToken)
                          .NoSync();
 
-        string nuGetPackagePath = Path.Combine(gitDirectory, $"{libraryName}.{version}.nupkg");
+        string nuGetPackagePath = GetPathWithin(gitDirectory, $"{libraryName}.{version}.nupkg", "NuGet package");
 
         await _dotnetNuGetUtil.Push(nuGetPackagePath, apiKey: nuGetToken, cancellationToken: cancellationToken)
                               .NoSync();
@@ -69,15 +70,18 @@ public sealed class NuGetPackageManager : INuGetPackageManager
     public async ValueTask BuildPackAndPushDirectory(string gitDirectory, string libraryName, string targetDirectory, string sourceDirectory, string version,
         string nuGetToken, CancellationToken cancellationToken = default)
     {
-        await _directoryUtil.DeleteIfExists(targetDirectory, cancellationToken)
+        string resourcesDir = GetPathWithin(gitDirectory, Path.Combine("src", libraryName, "Resources"), "Resources directory");
+        string safeTargetDirectory = GetPathWithin(resourcesDir, targetDirectory, "Target directory");
+
+        await _directoryUtil.DeleteIfExists(safeTargetDirectory, cancellationToken)
                             .NoSync();
-        await _directoryUtil.Create(targetDirectory, cancellationToken: cancellationToken)
+        await _directoryUtil.Create(safeTargetDirectory, cancellationToken: cancellationToken)
                             .NoSync();
 
-        await _fileUtil.CopyRecursively(sourceDirectory, targetDirectory, true, cancellationToken)
+        await _fileUtil.CopyRecursively(sourceDirectory, safeTargetDirectory, true, cancellationToken)
                        .NoSync();
 
-        string projFilePath = Path.Combine(gitDirectory, "src", libraryName, $"{libraryName}.csproj");
+        string projFilePath = GetPathWithin(gitDirectory, Path.Combine("src", libraryName, $"{libraryName}.csproj"), "Project file");
 
         await _dotnetUtil.Restore(projFilePath, cancellationToken: cancellationToken)
                          .NoSync();
@@ -86,16 +90,28 @@ public sealed class NuGetPackageManager : INuGetPackageManager
                                            .NoSync();
 
         if (!successful)
-            throw new Exception("Build was not successful, exiting...");
+            throw new InvalidOperationException("Build was not successful, exiting...");
 
         await _dotnetUtil.Pack(projFilePath, version, configuration: "Release", restore: false, output: gitDirectory, cancellationToken: cancellationToken)
                          .NoSync();
 
-        string nuGetPackagePath = Path.Combine(gitDirectory, $"{libraryName}.{version}.nupkg");
+        string nuGetPackagePath = GetPathWithin(gitDirectory, $"{libraryName}.{version}.nupkg", "NuGet package");
 
         await _dotnetNuGetUtil.Push(nuGetPackagePath, apiKey: nuGetToken, cancellationToken: cancellationToken)
                               .NoSync();
 
         _logger.LogInformation("Package pushed to NuGet successfully.");
+    }
+
+    private static string GetPathWithin(string rootDirectory, string path, string description)
+    {
+        string root = Path.GetFullPath(rootDirectory);
+        string candidate = Path.GetFullPath(path, root);
+        string rootPrefix = Path.TrimEndingDirectorySeparator(root) + Path.DirectorySeparatorChar;
+
+        if (!candidate.StartsWith(rootPrefix, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException($"{description} must be located within {root}.");
+
+        return candidate;
     }
 }
