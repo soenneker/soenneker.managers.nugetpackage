@@ -12,6 +12,7 @@ using Soenneker.Utils.File.Abstract;
 
 namespace Soenneker.Managers.NuGetPackage;
 
+/// <inheritdoc cref="INuGetPackageManager" />
 public sealed class NuGetPackageManager : INuGetPackageManager
 {
     private readonly ILogger<NuGetPackageManager> _logger;
