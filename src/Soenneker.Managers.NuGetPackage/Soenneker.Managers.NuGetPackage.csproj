@@ -45,9 +45,9 @@
     </ItemGroup>
 
     <ItemGroup>
-<PackageReference Include="Soenneker.Utils.Dotnet.NuGet" Version="4.0.2137" />
+<PackageReference Include="Soenneker.Utils.Dotnet.NuGet" Version="4.0.2144" />
 </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Soenneker.Extensions.ValueTask" Version="4.0.127" />
+        <PackageReference Include="Soenneker.Extensions.ValueTask" Version="4.0.132" />
     </ItemGroup>
 </Project>
